@@ -10,41 +10,67 @@
 
   addChappterButton.addEventListener('click', () => addNewChapter());
 
+  function createElement(tag, classList) {
+    if (typeof tag !== 'string' || typeof classList !== 'object') {
+      return;
+    }
+
+    let element = document.createElement(tag);
+    classList.forEach((cls) => element.classList.add(cls));
+
+    return element;
+  }
+
+  function getListItemElement() {
+    return createElement('li', ['list-group-item', 'border-0']);
+  }
+
+  function getDivElement() {
+    return createElement('div', ['input-group', 'input-group-sm']);
+  }
+
+  function getInputElement() {
+    return createElement('input', ['form-control']);
+  }
+
+  function getButtonWithIcon(iconClass) {
+    let icon = createElement('i', ['bi', iconClass]);
+    let button = createElement('button', ['btn', 'btn-outline-secondary']);
+    button.append(icon);
+
+    return button;
+  }
+
+  function createButtonWithFunction(iconClass, func) {
+    if (typeof iconClass !== 'string' || typeof func !== 'function') {
+      return;
+    }
+
+    let button = getButtonWithIcon(iconClass);
+    button.onclick = func;
+
+    return button;
+  }
+
+  function getRemoveButtonElement() {
+    return createButtonWithFunction('bi-trash', removeChapter);
+  }
+
+  function getAddButtonElement() {
+    return createButtonWithFunction('bi-plus', addNewSubchapter);
+  }
+
+  function getOrderedListElement() {
+    return createElement('ol', ['list-group', 'list-group-numbered']);
+  }
+
   function createListItemElement() {
-    let listItemElement = document.createElement('li');
-    listItemElement.classList.add('list-group-item');
-    listItemElement.classList.add('border-0');
-
-    let divElement = document.createElement('div');
-    divElement.classList.add('input-group');
-    divElement.classList.add('input-group-sm');
-
-    let inputTitleElement = document.createElement('input');
-    inputTitleElement.classList.add('form-control');
-
-    let trashIconElement = document.createElement('i');
-    trashIconElement.classList.add('bi');
-    trashIconElement.classList.add('bi-trash');
-
-    let removeButtonElement = document.createElement('button');
-    removeButtonElement.onclick = removeChapter;
-    removeButtonElement.classList.add('btn');
-    removeButtonElement.classList.add('btn-outline-secondary');
-    removeButtonElement.append(trashIconElement);
-
-    let plusIconElement = document.createElement('i');
-    plusIconElement.classList.add('bi');
-    plusIconElement.classList.add('bi-plus');
-
-    let addButtonElement = document.createElement('button');
-    addButtonElement.onclick = addNewSubchapter;
-    addButtonElement.classList.add('btn');
-    addButtonElement.classList.add('btn-outline-secondary');
-    addButtonElement.append(plusIconElement);
-
-    let orderedListElement = document.createElement('ol');
-    orderedListElement.classList.add('list-group');
-    orderedListElement.classList.add('list-group-numbered');
+    let listItemElement = getListItemElement();
+    let divElement = getDivElement();
+    let inputTitleElement = getInputElement();
+    let removeButtonElement = getRemoveButtonElement();
+    let addButtonElement = getAddButtonElement();
+    let orderedListElement = getOrderedListElement();
 
     divElement.append(inputTitleElement);
     divElement.append(removeButtonElement);
@@ -60,7 +86,7 @@
     chaptersObject.append(listItemElement);
   }
 
-  function addNewSubchapter(event) {
+  function getParentNode(event) {
     let parentNode;
 
     switch (event.target.tagName) {
@@ -71,6 +97,12 @@
         parentNode = event.target.parentNode.parentNode;
         break;
     }
+
+    return parentNode;
+  }
+
+  function addNewSubchapter(event) {
+    let parentNode = getParentNode(event);
 
     if (parentNode) {
       let orderedListElement = parentNode.querySelector('ol');
@@ -81,18 +113,9 @@
   }
 
   function removeChapter(event) {
-    let parentNode;
+    let parentNode = getParentNode(event);
 
-    switch (event.target.tagName) {
-      case 'I':
-        parentNode = event.target.parentNode.parentNode.parentNode;
-        break;
-      case 'BUTTON':
-        parentNode = event.target.parentNode.parentNode;
-        break;
-    }
-
-    if (parentNode && confirm('Você deseja remover o capítulo? Lembre-se que os subcapítulos vão pro saco.')) {
+    if (parentNode && confirm('Você deseja remover o capítulo? Lembre-se que os subcapítulos serão removidos.')) {
       parentNode.remove();
     }
   }
