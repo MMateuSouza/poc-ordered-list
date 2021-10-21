@@ -1,14 +1,16 @@
 (function () {
   let chaptersObject = document.querySelector('#chapters');
   let chaptersQuantity = chaptersObject.querySelectorAll('li');
-  let addChappterButton = document.querySelector('#add-chapter');
+  let addChapterButton = document.querySelector('#add-chapter');
+  let convertChapterButton = document.querySelector('#convert-chapter');
 
   // Nova visualização
   if (chaptersQuantity.length === 0) {
     addNewChapter();
   }
 
-  addChappterButton.addEventListener('click', () => addNewChapter());
+  addChapterButton.addEventListener('click', () => addNewChapter());
+  convertChapterButton.addEventListener('click', () => getConvertedChapter());
 
   function createElement(tag, classList) {
     if (typeof tag !== 'string' || typeof classList !== 'object') {
@@ -84,6 +86,36 @@
   function addNewChapter() {
     let listItemElement = createListItemElement();
     chaptersObject.append(listItemElement);
+  }
+
+  function convertChapter(element) {
+    let chapters = [];
+    let orderedListElement = element;
+
+    let listItem = orderedListElement.querySelector('li:first-child');
+
+    while (listItem) {
+      let insideOrderedListElement = listItem.querySelector('ol');
+      let subchapters = convertChapter(insideOrderedListElement);
+
+      let chapterInputElement = listItem.querySelector('input');
+      let chapterTitle = chapterInputElement.value;
+      let chapter = {};
+      chapter.title = chapterTitle;
+      chapter.subchapters = subchapters;
+      chapters.push(chapter);
+
+      listItem.remove();
+      listItem = orderedListElement.querySelector('li:first-child');
+    }
+
+    return chapters;
+  }
+
+  function getConvertedChapter() {
+    let orderListObject = document.querySelector('#chapters');
+    let chapters = convertChapter(orderListObject.cloneNode(true));
+    console.log(chapters);
   }
 
   function getParentNode(event) {
